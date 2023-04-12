@@ -1,4 +1,5 @@
 import { IApi } from 'umi';
+import { Router } from 'express';
 
 export default (api: IApi) => {
   api.describe({
@@ -10,11 +11,25 @@ export default (api: IApi) => {
     },
     enableBy: api.EnableBy.config,
   });
-  api.addBeforeMiddlewares(() => {
-    return (req, res, next) => {
+  // api.addBeforeMiddlewares(() => {
+  //   return (req, res, next) => {
+  //     res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+  //     res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+  //     next();
+  //   };
+  // });
+
+  api.onBeforeMiddleware(({ app }) => {
+    const router = Router();
+
+    router.use((req, res, next) => {
       res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
       res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
       next();
-    };
+    });
+
+    router.use(app._router);
+
+    app._router = router;
   });
 };
