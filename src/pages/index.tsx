@@ -5,8 +5,6 @@ import * as _ from 'lodash';
 import { useMonacoEditor } from '@/hooks/useMonacoEditor';
 import { useProjectDirectory } from '@/hooks/useProjectDirectory';
 
-console.log(useMonacoEditor);
-
 export default function HomePage() {
   const webContainerInstanceRef = useRef<WebContainer | null>(null);
 
@@ -25,18 +23,46 @@ export default function HomePage() {
     setModel(currentFileContent, currentFilePath[currentFilePath.length - 1]);
   }, [filePath.current, fileContent.current]);
 
+  async function installDependencies() {
+    // Install dependencies
+    const installProcess = await webContainerInstanceRef.current?.spawn(
+      'yarn',
+      ['install']
+    );
+    installProcess?.output.pipeTo(
+      new WritableStream({
+        write(data) {
+          console.log(data);
+        },
+      })
+    );
+    // Wait for install command to exit
+    return installProcess?.exit;
+  }
+
   async function startDevServer() {
     // Run `npm run start` to start the Express app
 
+    await installDependencies();
+
     const startServerProcess = await webContainerInstanceRef.current?.spawn(
-      'node',
-      ['./app/index.js']
+      'yarn',
+      ['start']
     );
 
     // Wait for `server-ready` event
     webContainerInstanceRef.current?.on('server-ready', (port, url) => {
-      console.log(`server ready on port ${port} and url ${url}`);
-      // window.open(url, '_blank');
+      if (terminalDomRef.current) {
+        terminalDomRef.current.innerText += `server ready on port ${port} and url ${url}`;
+      }
+    });
+
+    webContainerInstanceRef.current?.on('error', (error) => {
+      console.error(error);
+    });
+
+    webContainerInstanceRef.current?.on('port', (port, type, url) => {
+      console.error(port, type, url);
     });
 
     startServerProcess?.output.pipeTo(
@@ -61,10 +87,7 @@ export default function HomePage() {
 
     startDevServer();
 
-    setModel(
-      files['app'].directory['index.js'].file.contents || '',
-      'index.js'
-    );
+    setModel(files['package.json'].file.contents || '', 'package.json');
 
     // editorInstance.current.onDidChangeModelContent((e) => {
     //   console.log(editorInstance.current?.getValue(), filePath.current);

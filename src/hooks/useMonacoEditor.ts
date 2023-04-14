@@ -8,6 +8,11 @@ const getLanguage = (ext: string) => {
       return 'javascript';
     case 'json':
       return 'json';
+    case 'less':
+      return 'less';
+    case 'ts':
+    case 'tsx':
+      return 'typescript';
     default:
       return 'plaintext';
   }
