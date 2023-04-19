@@ -1,0 +1,52 @@
+@tabs-bgc: rgb(29, 34, 39);
+@tab-selected-bgc: rgb(48, 56, 65);
+@tab-hover-bgc: rgb(46, 52, 60);
+@tab-bgc: rgb(29, 34, 39);
+@tab-text-color-default: rgb(185, 187, 189);
+@tab-text-color-selected: white;
+@tab-text-color-hover: white;
+
+.tab_container {
+  width: calc(100% - 30px);
+  height: 100%;
+  background-color: @tabs-bgc;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: flex-end;
+  .tab {
+    width: 220px;
+    font-size: 0.9em;
+    border-top-right-radius: 8px;
+    border-top-left-radius: 8px;
+    text-align: left;
+    box-sizing: border-box;
+    padding: 8px 12px;
+    height: calc(100% - 2px);
+    display: flex;
+    align-items: center;
+    background-color: @tab-selected-bgc;
+    color: white;
+    position: relative;
+    &.tmp_tab {
+      font-style: italic;
+    }
+    .tab_close_icon {
+      cursor: pointer;
+      position: absolute;
+      font-size: 12px;
+      font-weight: bold;
+      right: 12px;
+      color: rgb(152, 156, 160);
+      &:hover {
+        opacity: 0.9;
+      }
+    }
+    &.unused_tab {
+      background-color: @tab-bgc;
+      transition: all 0.1s;
+    }
+    &.unused_tab:hover {
+      background-color: @tab-hover-bgc;
+    }
+  }
+}

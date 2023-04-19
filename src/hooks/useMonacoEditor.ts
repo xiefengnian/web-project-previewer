@@ -38,6 +38,7 @@ export const useMonacoEditor = () => {
   const init = (dom: HTMLElement) => {
     const instance = (editorInstance.current = monaco.editor.create(dom, {
       model: null,
+      theme: 'vs-dark',
     }));
     instance.onDidChangeModelContent((e) => {
       console.log(e);

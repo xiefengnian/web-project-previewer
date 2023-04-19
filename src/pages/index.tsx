@@ -4,140 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 import * as _ from 'lodash';
 import { useMonacoEditor } from '@/hooks/useMonacoEditor';
 import { useProjectDirectory } from '@/hooks/useProjectDirectory';
-import { CloseOutlined } from '@ant-design/icons';
-import cx from 'classnames';
-import { Skeleton } from 'antd';
-
-type TabType = {
-  filename: string;
-  fileKey: string;
-};
-
-const useTabs = (initTabs: TabType[], initActiveTab: string) => {
-  const [tmpTab, setTmpTab] = useState<TabType | undefined>();
-
-  const [activeTab, setActiveTab] = useState<string | undefined>(initActiveTab);
-
-  const [openedTabs, setOpenedTabs] = useState<TabType[]>(initTabs);
-
-  const [loading, setLoading] = useState(true);
-
-  const doneLoad = () => {
-    setLoading(false);
-  };
-
-  const openTab = (filename: string, fileKey: string) => {
-    if (openedTabs.find((tab) => tab.fileKey === fileKey)) {
-      setActiveTab(fileKey);
-      return;
-    }
-    if (tmpTab && tmpTab.fileKey === fileKey) {
-      tmpTab2OpenedTab();
-      return;
-    }
-    setOpenedTabs([...openedTabs, { filename, fileKey }]);
-    setActiveTab(fileKey);
-  };
-
-  const removeTab = (fileKey: string) => {
-    if (fileKey === tmpTab?.fileKey) {
-      setTmpTab(undefined);
-      setActiveTab(openedTabs[0]?.fileKey);
-    } else {
-      const nextState = openedTabs
-        .filter((tab) => tab.fileKey !== fileKey)
-        .slice();
-      if (nextState.length === 0 && tmpTab) {
-        setActiveTab(tmpTab.fileKey);
-      } else {
-        setActiveTab(nextState[0]?.fileKey);
-      }
-      setOpenedTabs(nextState);
-    }
-  };
-
-  const tmpTab2OpenedTab = () => {
-    if (tmpTab) {
-      const key = tmpTab.fileKey;
-      setOpenedTabs([...openedTabs, tmpTab]);
-      setTmpTab(undefined);
-      setActiveTab(key);
-    }
-  };
-
-  const openTmpTab = (filename: string, fileKey: string) => {
-    if (openedTabs.find((tab) => tab.fileKey === fileKey)) {
-      setActiveTab(fileKey);
-      return;
-    }
-    setTmpTab({ filename, fileKey });
-    setActiveTab(fileKey);
-  };
-
-  const tabs = (
-    <div className={styles.tab_container}>
-      {loading ? (
-        <Skeleton></Skeleton>
-      ) : (
-        <>
-          {openedTabs.map((tab) => (
-            <div
-              className={cx(styles.tab, {
-                [styles.unused_tab]: tab.fileKey !== activeTab,
-              })}
-              key={tab.fileKey}
-              onClick={() => {
-                setActiveTab(tab.fileKey);
-              }}
-            >
-              {tab.filename}
-              <CloseOutlined
-                className={styles.tab_close_icon}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  removeTab(tab.fileKey);
-                }}
-              />
-            </div>
-          ))}
-          {tmpTab && (
-            <div
-              onClick={() => {
-                setActiveTab(tmpTab.fileKey);
-              }}
-              onDoubleClick={() => {
-                tmpTab2OpenedTab();
-              }}
-              className={cx(styles.tab, styles.tmp_tab, {
-                [styles.unused_tab]: tmpTab.fileKey !== activeTab,
-              })}
-            >
-              {tmpTab.filename}
-              <CloseOutlined
-                className={styles.tab_close_icon}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  removeTab(tmpTab.fileKey);
-                }}
-              />
-            </div>
-          )}
-        </>
-      )}
-    </div>
-  );
-
-  console.log({ loading });
-
-  return {
-    tabs,
-    activeTab,
-    openTab,
-    openTmpTab,
-    openedTabs,
-    doneLoad,
-  };
-};
+import { useTabs } from '@/hooks/useTabs';
+import { useTerminal } from '@/hooks/useTerminal';
 
 const filepath2fileKey = (filepath: string[]) => filepath.join('/');
 
@@ -147,6 +15,8 @@ export default function HomePage() {
   const terminalDomRef = useRef<HTMLDivElement>(null);
 
   const editorDomRef = useRef<HTMLDivElement | null>(null);
+
+  const { terminal, init: terminalInit } = useTerminal('helper-demo', 'master');
 
   const {
     load,
@@ -287,23 +157,18 @@ export default function HomePage() {
   const init = async () => {
     const files = await (await fetch('http://localhost:3111/get')).json();
 
-    webContainerInstanceRef.current = await WebContainer.boot();
-
-    await webContainerInstanceRef.current.mount(files);
+    await terminalInit(terminalDomRef.current!, files);
 
     load(files);
+
+    editorInit(editorDomRef.current!);
 
     // startDevServer();
 
     setModel(files['package.json'].file.contents || '', 'package.json');
-
-    // editorInstance.current.onDidChangeModelContent((e) => {
-    //   console.log(editorInstance.current?.getValue(), filePath.current);
-    // });
   };
 
   useEffect(() => {
-    editorInit(editorDomRef.current!);
     init();
   }, []);
 
@@ -324,7 +189,7 @@ export default function HomePage() {
               style={{ width: '100%', height: '100%' }}
             ></div>
           </div>
-          <div className={styles.terminal} ref={terminalDomRef}></div>
+          <div className={styles.terminal}>{terminal}</div>
         </div>
       </div>
     </div>
