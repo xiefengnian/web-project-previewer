@@ -11,13 +11,6 @@ export default (api: IApi) => {
     },
     enableBy: api.EnableBy.config,
   });
-  // api.addBeforeMiddlewares(() => {
-  //   return (req, res, next) => {
-  //     res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
-  //     res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
-  //     next();
-  //   };
-  // });
 
   api.onBeforeMiddleware(({ app }) => {
     const router = Router();

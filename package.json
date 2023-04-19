@@ -9,9 +9,11 @@
     "start": "npm run dev"
   },
   "dependencies": {
+    "@ant-design/icons": "^5.0.1",
     "@webcontainer/api": "^1.1.0",
     "ahooks": "^3.7.5",
     "antd": "^5.3.2",
+    "classnames": "^2.3.2",
     "lodash": "^4.17.21",
     "monaco-editor": "^0.37.1",
     "umi": "^4.0.63"

@@ -2,7 +2,6 @@ import * as monaco from 'monaco-editor';
 import { useEffect, useRef } from 'react';
 
 const getLanguage = (ext: string) => {
-  console.log({ ext });
   switch (ext) {
     case 'js':
       return 'javascript';
@@ -42,6 +41,9 @@ export const useMonacoEditor = () => {
     }));
     instance.onDidChangeModelContent((e) => {
       console.log(e);
+    });
+    instance.onDidFocusEditorText((e) => {
+      console.log('focus', e);
     });
   };
 
