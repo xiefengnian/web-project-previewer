@@ -25,6 +25,9 @@ dependencies:
   umi:
     specifier: ^4.0.63
     version: 4.0.63(@babel/core@7.21.3)(@types/react@18.0.28)(eslint@8.38.0)(postcss@8.4.21)(prettier@2.8.7)(react-dom@18.1.0)(react@18.1.0)(styled-components@5.3.9)(stylelint@14.16.1)(typescript@5.0.2)(webpack@5.78.0)
+  xterm:
+    specifier: ^5.1.0
+    version: 5.1.0
 
 devDependencies:
   '@types/express':
@@ -8724,6 +8727,10 @@ packages:
   /xtend@4.0.2:
     resolution: {integrity: sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==}
     engines: {node: '>=0.4'}
+    dev: false
+
+  /xterm@5.1.0:
+    resolution: {integrity: sha512-LovENH4WDzpwynj+OTkLyZgJPeDom9Gra4DMlGAgz6pZhIDCQ+YuO7yfwanY+gVbn/mmZIStNOnVRU/ikQuAEQ==}
     dev: false
 
   /y18n@5.0.8:

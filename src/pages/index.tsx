@@ -10,10 +10,6 @@ import { useTerminal } from '@/hooks/useTerminal';
 const filepath2fileKey = (filepath: string[]) => filepath.join('/');
 
 export default function HomePage() {
-  const webContainerInstanceRef = useRef<WebContainer | null>(null);
-
-  const terminalDomRef = useRef<HTMLDivElement>(null);
-
   const editorDomRef = useRef<HTMLDivElement | null>(null);
 
   const { terminal, init: terminalInit } = useTerminal('helper-demo', 'master');
@@ -101,63 +97,10 @@ export default function HomePage() {
     }
   }, [doubleClickFilepath]);
 
-  async function installDependencies() {
-    // Install dependencies
-    const installProcess = await webContainerInstanceRef.current?.spawn(
-      'yarn',
-      ['install']
-    );
-    installProcess?.output.pipeTo(
-      new WritableStream({
-        write(data) {
-          console.log(data);
-        },
-      })
-    );
-    // Wait for install command to exit
-    return installProcess?.exit;
-  }
-
-  async function startDevServer() {
-    // Run `npm run start` to start the Express app
-
-    await installDependencies();
-
-    const startServerProcess = await webContainerInstanceRef.current?.spawn(
-      'yarn',
-      ['start']
-    );
-
-    // Wait for `server-ready` event
-    webContainerInstanceRef.current?.on('server-ready', (port, url) => {
-      if (terminalDomRef.current) {
-        terminalDomRef.current.innerText += `server ready on port ${port} and url ${url}`;
-      }
-    });
-
-    webContainerInstanceRef.current?.on('error', (error) => {
-      console.error(error);
-    });
-
-    webContainerInstanceRef.current?.on('port', (port, type, url) => {
-      console.error(port, type, url);
-    });
-
-    startServerProcess?.output.pipeTo(
-      new WritableStream({
-        write(data) {
-          if (terminalDomRef.current) {
-            terminalDomRef.current.innerText += data;
-          }
-        },
-      })
-    );
-  }
-
   const init = async () => {
     const files = await (await fetch('http://localhost:3111/get')).json();
 
-    await terminalInit(terminalDomRef.current!, files);
+    await terminalInit(files);
 
     load(files);
 

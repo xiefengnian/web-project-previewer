@@ -16,7 +16,8 @@
     "classnames": "^2.3.2",
     "lodash": "^4.17.21",
     "monaco-editor": "^0.37.1",
-    "umi": "^4.0.63"
+    "umi": "^4.0.63",
+    "xterm": "^5.1.0"
   },
   "devDependencies": {
     "@types/express": "^4.17.17",
